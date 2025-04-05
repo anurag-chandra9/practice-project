@@ -1,8 +1,9 @@
 const {Router}= require("express")
 const adminRouter= Router();
-const {adminModel}= require("../db");
+const {adminModel, courseModel}= require("../db");
 const jwt= require("jsonwebtoken");
-const JWT_ADMIN_PASSWORD="Anurag11"; 
+const {adminMiddleware}= require("../middleware/admin")
+const {JWT_ADMIN_PASSWORD}=require("../config");
 adminRouter.post('/signup',async function(req,res){
     const {email, password, firstname, lastname}= req.body;
     try {
@@ -50,24 +51,58 @@ adminRouter.post('/signin', async function(req,res){
         message:"signin endpoint"
     })
 })
-adminRouter.put('/courses', function(req,res){
+
+adminRouter.post('/courses', async function(req,res){
+    const adminId= req.userId;
+    const {title,description,imageUrl,price}= req.boby;
+
+   const course= await courseModel.create({
+        title:title,
+        description:description,
+        imageUrl:imageUrl,
+        price:price,
+        creatorId:adminId
+    })
+    res.json({
+        message:"course created",
+        courseId: course._id 
+    })
+})
+adminRouter.put('/courses',adminMiddleware, async function(req,res){
+      const adminId= req.userId;
+      const {title,description,imageUrl,price,courseId}=req.body;
+      const course=await courseModel.updateOne({
+        _id:courseId,
+        creatorId:adminId
+      },{
+        title:title,
+        description:description,
+        imageUrl:imageUrl,
+        price:price
+      })
     res.json({
         message:"all your courses"
     })
 })
-adminRouter.post('/courses', function(req,res){
+
+adminRouter.get('/courses/bulk',adminMiddleware,async  function(req,res){
+   const adminId=req.userId;
+   const {title,description, imageUrl, price, courseId}= req.body;
+   const course = await courseModel.find({
+    _id:courseId,
+    creatorId:adminId
+   },{
+    title:title,
+    description:description,
+    imageUrl:imageUrl,
+    price:price
+   });
+    
+   
+  
     res.json({
-        message:"all your courses"
-    })
-})
-adminRouter.get('/courses', function(req,res){
-    res.json({
-        message:"all your courses"
-    })
-})
-adminRouter.get('/courses/bulk', function(req,res){
-    res.json({
-        message:"all your courses"
+        message:"all your courses",
+        courseId:course._id
     })
 })
 module.exports={

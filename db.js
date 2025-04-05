@@ -42,7 +42,7 @@ const adminModel=mongoose.model("admin", adminSchema);
 const courseModel=mongoose.model("course", courseSchema);
 const purchaseModel=mongoose.model("purchase", purchaseSchema);
 
-module.exports= {
+module.exports = {
     userModel,
     adminModel,
     courseModel,
