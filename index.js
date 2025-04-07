@@ -12,12 +12,18 @@ app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/course",  courseRouter);
 
 
-async function main(){
-  await mongoose.connect("mongodb+srv://Anurag88:Anurag888@cluster0tryproject.poyvfcd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0tryproject");
-  app.listen(3000, () => {
-    console.log('Server is running on port 3000');
-  });
-   
+async function main() {
+  try {
+    await mongoose.connect("mongodb+srv://Anurag88:Anurag888@cluster0tryproject.poyvfcd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0tryproject");
+    console.log("Connected to MongoDB");
+    
+    app.listen(3000, () => {
+      console.log('Server is running on port 3000');
+    });
+  } catch (err) {
+    console.error("Error connecting to MongoDB:", err);
+  }
 }
+main();
 
 

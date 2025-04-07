@@ -1,6 +1,6 @@
 const mongoose= require("mongoose");
 
-mongoose.connect("")
+
 
 
 const user = require("./routes/user");
