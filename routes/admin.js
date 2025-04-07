@@ -84,26 +84,45 @@ adminRouter.put('/courses',adminMiddleware, async function(req,res){
     })
 })
 
-adminRouter.get('/courses/bulk',adminMiddleware,async  function(req,res){
-   const adminId=req.userId;
-   const {title,description, imageUrl, price, courseId}= req.body;
-   const course = await courseModel.findOne({
-    _id:courseId,
-    creatorId:adminId
-   },{
-    title:title,
-    description:description,
-    imageUrl:imageUrl,
-    price:price
-   });
-    
-   
-  
-    res.json({
-        message:"all your courses",
-        courseId:course._id
-    })
-})
+// adminRouter.get('/courses/bulk',adminMiddleware,async  function(req,res){
+//    const adminId=req.userId;
+//    const {title,description, imageUrl, price, courseId}= req.query;
+//    const course = await courseModel.findOne({
+//     _id:courseId,
+//     creatorId:adminId
+//    },{
+//     title:title,
+//     description:description,
+//     imageUrl:imageUrl,
+//     price:price
+//    }); 
+//     res.json({
+//         message:"all your courses",
+//         courseId:course._id
+//     })
+// })
+adminRouter.get('/courses/bulk', adminMiddleware, async function(req, res) {
+    const adminId = req.userId;
+    const { title, description, imageUrl, price, courseId } = req.query;
+
+    const filter = { creatorId: adminId };
+
+    if (courseId) filter._id = courseId;
+    if (title) filter.title = title;
+    if (description) filter.description = description;
+    if (imageUrl) filter.imageUrl = imageUrl;
+    if (price) filter.price = price;
+
+    try {
+        const courses = await courseModel.find(filter); 
+        res.json({
+            message: "all your courses",
+            courses: courses
+        });
+    } catch (err) {
+        res.status(500).json({ message: "Something went wrong", error: err.message });
+    }
+});
 module.exports={
     adminRouter:adminRouter
 }
